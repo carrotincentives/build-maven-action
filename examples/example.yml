@@ -1,0 +1,31 @@
+name: Build and Push Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_version:
+        description: 'Version to tag the image with'
+        required: true
+      git_branch:
+        description: 'Branch to checkout'
+        required: false
+        default: 'develop'
+      git_commit_hash:
+        description: 'Commit Hash to checkout'
+        required: false
+        default: ''
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Reusable Build & Push Action
+        uses: carrotincentives/build-maven-action@v1
+        with:
+          git_branch: ${{ github.event.inputs.git_branch }}
+          git_commit_hash: ${{ github.event.inputs.git_commit_hash }}
+          java_version: '11'
+          maven_version: '3.8.6'
+          build_version: ${{ github.event.inputs.build_version || 'latest' }}
+          dockerfile_path: './Dockerfile'
