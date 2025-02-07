@@ -1,34 +1,33 @@
-name: Build and Push Docker Image
+name: Build, Test, and Deploy
 
 on:
-  workflow_dispatch:
-    inputs:
-    checkout_ref:
-      description: 'Git reference to checkout (branch, tag, or commit hash)'
-        required: true
-        default: 'main'
-      build_version:
-        description: 'Version to tag the Docker image'
-        required: true
-        default: 'latest'
-
+  push:
+    branches:
+      - main
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Run Reusable Build & Push Action
+      - name: Build and Push Docker Image
         uses: carrotincentives/build-maven-action@v1
         with:
-          checkout_ref: ${{ github.event.inputs.checkout_ref }}
-          java_version: '21'
+          # Repository Checkout
+          checkout_ref: 'main'
+
+          # Java and Maven Configuration
+          java_version: '11'
           java_distribution: 'zulu'
-          maven_version: '3.8.6'
+          maven_version: '3.8.4'
           maven_options: '-U clean package -DskipTests'
-          dockerfile_path: './src/main/docker/Dockerfile.jvm'
-          image_name: 'docker-registry/image'
-          build_version: ${{ github.event.inputs.build_version }}
-          registry_username: 'docker-registry-user'
-          registry_password: 'docker-registry-password'
-          registry_url: 'docker-registry-url'
+
+          # Docker Build & Tagging
+          dockerfile_path: './Dockerfile'
+          image_name: 'my-java-app'
+          build_version: 'v1.0.0'
+
+          # Docker Registry Credentials
+          registry_url: 'docker.io'
+          registry_username: 'your-username'
+          registry_password: 'your-password'
