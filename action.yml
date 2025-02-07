@@ -1,32 +1,50 @@
 name: 'Build and Push Docker Image'
-
-description: 'A reusable GitHub Action to build Java applications with Maven, build a Docker image, and push it to a registry'
+description: 'A reusable GitHub Action to build Java applications with Maven, create a Docker image, and push it to a registry'
 
 inputs:
-  git_branch:
-    description: 'Branch to checkout'
+  # Repository Checkout
+  checkout_ref:
+    description: 'Git reference to checkout (branch, tag, or commit hash)'
     required: true
-  git_commit_hash:
-    description: 'Commit Hash to checkout'
-    required: false
-    default: ''
-  java_distribution:
-    description: 'Java distribution to use'
-    required: true
-    default: 'zulu'
+
+  # Java and Maven Configuration
   java_version:
     description: 'Java version to use'
     required: true
+  java_distribution:
+    description: 'Java distribution to use (default: zulu)'
+    required: false
+    default: 'zulu'
   maven_version:
     description: 'Maven version to use'
     required: true
+  maven_options:
+    description: 'Maven options for building the project (default: "-U clean package -DskipTests")'
+    required: false
+    default: '-U clean package -DskipTests'
+
+  # Docker Build & Tagging
   build_version:
-    description: 'Version to tag the image with'
+    description: 'Version to tag the Docker image with'
     required: true
   dockerfile_path:
-    description: 'Path to the Dockerfile (Root of the repository by default, e.g.: ./Dockerfile)'
+    description: 'Path to the Dockerfile (default: "./Dockerfile")'
     required: true
     default: './Dockerfile'
+  image_name:
+    description: 'Name of the Docker image'
+    required: true
+
+  # Docker Registry Credentials
+  registry_url:
+    description: 'URL of the Docker registry'
+    required: true
+  registry_username:
+    description: 'Username for the Docker registry'
+    required: true
+  registry_password:
+    description: 'Password for the Docker registry'
+    required: true
 
 runs:
   using: "composite"
@@ -34,15 +52,8 @@ runs:
     - name: Checkout Repository
       uses: actions/checkout@v4
       with:
-        ref: ${{ inputs.git_branch }}
+        ref: ${{ inputs.checkout_ref }}
         fetch-depth: 0
-
-    - name: Checkout Specific Commit (if provided)
-      run: |
-        if [[ -n "${{ inputs.git_commit_hash }}" ]]; then
-          git checkout ${{ inputs.git_commit_hash }}
-        fi
-      shell: bash
 
     - name: Set Up Java & Maven
       uses: s4u/setup-maven-action@v1.18.0
@@ -54,18 +65,18 @@ runs:
     - name: Maven Build
       run: |
         mvn initialize
-        mvn -U clean package -DskipTests
+        mvn ${{ inputs.maven_options }}
       shell: bash
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Login to Nexus
+    - name: Login to Docker Registry
       uses: docker/login-action@v3
       with:
-        registry: ${{ secrets.REGISTRY_URL }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        registry: ${{ inputs.registry_url }}
+        username: ${{ inputs.registry_username }}
+        password: ${{ inputs.registry_password }}
         logout: true
 
     - name: Build and Push Docker Image
@@ -74,5 +85,4 @@ runs:
         context: .
         file: ${{ inputs.dockerfile_path }}
         push: true
-        tags: |
-          ${{ secrets.REGISTRY_URL }}/${{ secrets.IMAGE_NAME }}:${{ inputs.build_version }}
+        tags: ${{ inputs.registry_url }}/${{ inputs.image_name }}:${{ inputs.build_version }}
