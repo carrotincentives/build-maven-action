@@ -6,9 +6,11 @@ on:
     checkout_ref:
       description: 'Git reference to checkout (branch, tag, or commit hash)'
         required: true
+        default: 'main'
       build_version:
         description: 'Version to tag the Docker image'
         required: true
+        default: 'latest'
 
 
 jobs:
@@ -20,11 +22,15 @@ jobs:
         uses: carrotincentives/build-maven-action@v1
         with:
           checkout_ref: ${{ github.event.inputs.checkout_ref }}
-          java_version: '11'
-          maven_version: '3.6.3'
-          image_name: 'my-docker-image'
+          java_version: '21'
+          java_distribution: 'zulu'
+          maven_version: '3.8.6'
+          maven_options: '-U clean package -DskipTests'
+          dockerfile_path: './src/main/docker/Dockerfile.jvm'
+          image_name: 'docker-registry/image'
           build_version: ${{ github.event.inputs.build_version }}
-          registry_url: 'my-docker-registry'
-          registry_username: ${{ secrets.REGISTRY_USERNAME }}
-          registry_password: ${{ secrets.REGISTRY_PASSWORD }}
+          registry_username: 'docker-registry-user'
+          registry_password: 'docker-registry-password'
+          registry_url: 'docker-registry-url'
+
 ```
