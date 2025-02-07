@@ -32,5 +32,3 @@ jobs:
           registry_username: 'docker-registry-user'
           registry_password: 'docker-registry-password'
           registry_url: 'docker-registry-url'
-
-```
