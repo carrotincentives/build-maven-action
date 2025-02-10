@@ -19,9 +19,10 @@ This GitHub Action automates the following tasks:
 | ------------------ | ------------------------------------------------------------------------------------------------------- | -------- | ------------------------ |
 | `checkout_ref`     | Git reference to checkout (branch, tag, or commit hash).                                                | Yes      |                          |
 | `java_version`     | Java version to use.                                                                                    | Yes      |                          |
-| `java_distribution`| Java distribution to use (e.g., `zulu`).                                                                 | No       | `zulu`                   |
+| `java_distribution`| Java distribution to use (e.g., `zulu`).                                                                | No       | `zulu`                   |
 | `maven_version`    | Maven version to use.                                                                                   | Yes      |                          |
-| `maven_options`    | Maven options for building the project.                                                               | No       | `-U clean package -DskipTests` |
+| `maven_options`    | Maven options for building the project.                                                                 | No       | `-U clean package -DskipTests` |
+| `docker_context`   | Path to the Docker build context.                                                                       | No       | `.`                      |
 | `dockerfile_path`  | Path to the Dockerfile.                                                                                 | No       | `./Dockerfile`           |
 | `image_name`       | Name of the Docker image.                                                                               | Yes      |                          |
 | `build_version`    | Version to tag the Docker image with.                                                                   | Yes      |                          |

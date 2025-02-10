@@ -24,6 +24,10 @@ inputs:
     default: '-U clean package -DskipTests'
 
   # Docker Build & Tagging
+  docker_context:
+    description: 'Path to the Docker build context'
+    required: true
+    default: '.'
   dockerfile_path:
     description: 'Path to the Dockerfile (default: "./Dockerfile")'
     required: false
@@ -79,7 +83,7 @@ runs:
     - name: Build and Push Docker Image
       uses: docker/build-push-action@v5
       with:
-        context: .
+        context: ${{ inputs.docker_context }}
         file: ${{ inputs.dockerfile_path }}
         push: true
         tags: ${{ inputs.registry_url }}/${{ inputs.image_name }}:${{ inputs.build_version }}
