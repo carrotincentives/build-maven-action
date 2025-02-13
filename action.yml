@@ -68,6 +68,8 @@ runs:
 
     - name: Maven Build
       run: |
+        git branch --show-current
+        git log --oneline -5
         mvn initialize
         mvn ${{ inputs.maven_options }}
       shell: bash
