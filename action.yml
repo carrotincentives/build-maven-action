@@ -65,11 +65,11 @@ runs:
         java-version: ${{ inputs.java_version }}
         java-distribution: ${{ inputs.java_distribution }}
         maven-version: ${{ inputs.maven_version }}
+        checkout-enabled: false
 
     - name: Maven Build
       run: |
         git branch --show-current
-        git log --oneline -5
         mvn initialize
         mvn ${{ inputs.maven_options }}
       shell: bash
